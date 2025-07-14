@@ -1,4 +1,4 @@
-
+//! Super keyword is used to mention the perant class attributes   
 void mina() {}
 
 class One {
