@@ -112,16 +112,35 @@ class _MyApp_stateful extends State<MyApp_stateful> {
   bool val = false;
   bool checkbox_value = false;
   String? Country;
-
   String? Textfeild_value;
-
   TextEditingController textfeild_value = TextEditingController() ;
+  GlobalKey<FormState> formstate = GlobalKey();
+  GlobalKey<ScaffoldState> scaffoldstate = GlobalKey();
+
+  String? name;
 
 
   @override
   Widget build(BuildContext context) {
     //! =============================================================== Appbar ===========================================================
-    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 1.5,centerTitle: true,backgroundColor: Colors.blue);
+    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 30.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black,);
+
+    //! =============================================================== Drawer ===========================================================
+    Row banner_user = Row(children: [Container(width: 40,height: 40,child: ClipRRect(child:Image.asset("images/gym.jpg",fit: BoxFit.cover,),borderRadius: BorderRadius.circular(20))),Expanded(child: ListTile(title: Text("awadallayossef232"),subtitle: Text("awadallayossef@gmail.com"),))],);
+    ListView drawer_widgets = ListView(children: [
+    banner_user,
+    ListTile(title: Text("Home"),leading: Icon(Icons.home),onTap: () {}),
+    ListTile(title: Text("Account"),leading: Icon(Icons.account_balance),onTap: () {}),
+    ListTile(title: Text("order"),leading: Icon(Icons.check_box),onTap: () {}),
+    ListTile(title: Text("about us"),leading: Icon(Icons.help),onTap: () {}),
+    ListTile(title: Text("contact us"),leading: Icon(Icons.phone_android_outlined),onTap: () {}),
+    ListTile(title: Text("sign out"),leading: Icon(Icons.logout_outlined),onTap: () {}),
+    ListTile(title: Text("Home"),leading: Icon(Icons.home),onTap: () {}),
+    ListTile(title: Text("Home"),leading: Icon(Icons.home),onTap: () {}),
+    ],);
+    Drawer app_drawer = Drawer(child: Container(child: drawer_widgets,padding: EdgeInsets.all(10),),);
+    MaterialButton open_drawer_button = MaterialButton(onPressed: (){scaffoldstate.currentState!.openDrawer();},child: Text("on pressed"),textColor: Colors.white,color: Colors.black,); 
+
 
     //! =============================================================== Text ===========================================================
     TextStyle textstyle = TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 20,backgroundColor: Colors.white);
@@ -163,21 +182,27 @@ class _MyApp_stateful extends State<MyApp_stateful> {
     TextField app_textfeild = TextField(decoration: decoration_textfeild,keyboardType: TextInputType.name,controller:textfeild_value ,onChanged: (value) => onchange_textfeild(value),maxLength: 20,);
     // MaterialButton mat_button = MaterialButton(onPressed: (){print(textfeild_value.text);},child: Text("on pressed"),textColor: Colors.white,color: Colors.black,); 
 
-
     var Textfeilds_colmn = Column(children: [app_textfeild,Text("$Textfeild_value")],);
+
+    //! =============================================================== TextFormField validator ===========================================================
+
+    var app_form = Form(key:formstate ,child: TextFormField(obscureText: true,autovalidateMode: AutovalidateMode.always,validator: (value) => form_validotor(value),onSaved: (newValue) => name = newValue,));
+    // MaterialButton mat_button = MaterialButton(onPressed:() => validate(),child: Text("on pressed"),textColor: Colors.white,color: Colors.black,); 
+
+    var Textfeildsfrom_colmn = Column(children: [app_form],);
 
 
 
     //! =============================================================== Container ===========================================================
     // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
     Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center, 
-    child:Textfeilds_colmn);
+    child: open_drawer_button,);
 
 
 
 
 
-    var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer));
+    var mainapp = Scaffold(key: scaffoldstate,appBar: appbarscreen,drawer: app_drawer,body: Center(child:screencontainer));
     return MaterialApp(home: mainapp);
   }
 
@@ -212,5 +237,32 @@ class _MyApp_stateful extends State<MyApp_stateful> {
   void onchange_textfeild(String val) => setState(() {
     Textfeild_value = val;
   });
+
+
+  String? form_validotor (String? value) {
+    if(value == null || value.isEmpty){
+      return "Feild is empty";
+    }
+
+    if (value.length > 10){
+      return "Is larger than 10 Letters";
+    }
+    return null;
+  } 
+
+
+  void validate() {
+    if(formstate.currentState!.validate())
+    {
+    formstate.currentState!.save();
+      print(name);
+      print("Valid");
+    } 
+    else
+    {
+      print("Hello");
+    }
+
+  }
     
   }
