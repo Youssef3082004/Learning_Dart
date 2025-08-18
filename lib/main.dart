@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'custom.dart'; 
 
 void main() {
-  runApp(MyApp_stateful());
+  runApp(Tabbbar());
 }
 
 class MyApp extends StatelessWidget{
@@ -266,3 +267,92 @@ class _MyApp_stateful extends State<MyApp_stateful> {
   }
     
   }
+
+
+
+class Tabbbar extends StatefulWidget{
+  const Tabbbar({super.key});
+  @override
+  State<Tabbbar> createState() => _Tabbbar();
+}
+
+
+
+class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
+
+  TabController? tabController;
+
+  @override
+  void initState(){
+    tabController = TabController(length: 3, vsync: this);
+    super.initState();
+  }
+  int selectedindex = 0;
+
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    //! =============================================================== Tabbar ===========================================================
+
+    List<Tab> Tabs = [
+      Tab(text: "Medcine",icon: Icon(Icons.medical_information_rounded),),
+      Tab(text: "Home",icon: Icon(Icons.home),),
+      Tab(text: "Chatbot",icon: Icon(Icons.chat_sharp),)];
+
+    var Tabbar = TabBar(tabs:Tabs,indicatorColor: Colors.black,labelColor: Colors.black,unselectedLabelColor: Colors.white,controller: tabController,);
+    
+
+    //! =============================================================== Tabbar Views ===========================================================
+
+    List<Tab> TabsView = [Tab(child: Column(children: [Text("Medcine"),MaterialButton(onPressed: () => tabController!.animateTo(1),child: Text("Go To Home"),)],)),
+    Tab(child: Text("Home"),),Tab(child: Text("Chatbot"),)]; 
+    var Tabview = TabBarView(children:TabsView,controller: tabController, );
+
+    //! =============================================================== Bottem Navigitor Bar ===========================================================
+    List<BottomNavigationBarItem> items = [
+      BottomNavigationBarItem(icon: Icon(Icons.home),label: "Home"),
+      BottomNavigationBarItem(icon: Icon(Icons.settings),label: "Settings"),
+    ];
+  
+    var app_navbar = BottomNavigationBar(currentIndex: selectedindex,items: items,backgroundColor: Colors.blue,selectedItemColor: Colors.black,unselectedItemColor: Colors.white,onTap:(int val) =>Change_pages(val));
+    //! =============================================================== PageView ===========================================================  
+    // PageView app_pageview = PageView(children: [Text("page 1"),Text("page 2")],reverse: true,onPageChanged: (value) => print(value),);
+     
+    List<Text> widgets = [Text("page 1"),Text("page 2"),Text("page 3")];
+    PageView app_pageview = PageView.builder(itemCount: widgets.length,itemBuilder: (context, index) => widgets[index],);
+
+
+    //! =============================================================== Custom Widget ===========================================================  
+
+    Column cw_row = Column(children: [MyWidget(name: "Youssef Awadalla", email: "awadallayossef@gmail.com", Date: "30-8-2004")],);
+
+
+    //! =============================================================== Appbar ===========================================================  
+    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black,bottom: Tabbar,);
+
+    //! =============================================================== Container ===========================================================
+    // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
+    // Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: Tabview,  );
+    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: cw_row,  );
+
+
+
+    
+    var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,);
+    // DefaultTabController tabController = DefaultTabController(child:mainapp ,length: 3,);
+    return MaterialApp(home: mainapp);
+  }
+
+
+
+
+  void Change_pages(int val) => setState(() {
+    selectedindex = val;
+  });
+}
+
+
+
+
