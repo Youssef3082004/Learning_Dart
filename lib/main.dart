@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'custom.dart'; 
+import 'package:first_app/Navigator_work.dart'; 
+
 
 void main() {
   runApp(Tabbbar());
@@ -280,35 +282,14 @@ class Tabbbar extends StatefulWidget{
 
 class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
 
-  TabController? tabController;
-
-  @override
-  void initState(){
-    tabController = TabController(length: 3, vsync: this);
-    super.initState();
-  }
   int selectedindex = 0;
-
-
 
   @override
   Widget build(BuildContext context) {
 
-    //! =============================================================== Tabbar ===========================================================
+    //! =============================================================== Appbar ===========================================================  
+    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black);
 
-    List<Tab> Tabs = [
-      Tab(text: "Medcine",icon: Icon(Icons.medical_information_rounded),),
-      Tab(text: "Home",icon: Icon(Icons.home),),
-      Tab(text: "Chatbot",icon: Icon(Icons.chat_sharp),)];
-
-    var Tabbar = TabBar(tabs:Tabs,indicatorColor: Colors.black,labelColor: Colors.black,unselectedLabelColor: Colors.white,controller: tabController,);
-    
-
-    //! =============================================================== Tabbar Views ===========================================================
-
-    List<Tab> TabsView = [Tab(child: Column(children: [Text("Medcine"),MaterialButton(onPressed: () => tabController!.animateTo(1),child: Text("Go To Home"),)],)),
-    Tab(child: Text("Home"),),Tab(child: Text("Chatbot"),)]; 
-    var Tabview = TabBarView(children:TabsView,controller: tabController, );
 
     //! =============================================================== Bottem Navigitor Bar ===========================================================
     List<BottomNavigationBarItem> items = [
@@ -323,26 +304,27 @@ class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
     List<Text> widgets = [Text("page 1"),Text("page 2"),Text("page 3")];
     PageView app_pageview = PageView.builder(itemCount: widgets.length,itemBuilder: (context, index) => widgets[index],);
 
-
     //! =============================================================== Custom Widget ===========================================================  
-
     Column cw_row = Column(children: [MyWidget(name: "Youssef Awadalla", email: "awadallayossef@gmail.com", Date: "30-8-2004")],);
 
+    //! =============================================================== Alerts ===========================================================  
+    var dialog = MaterialButton(onPressed: () {showDialog(context: context, builder: (context){
 
-    //! =============================================================== Appbar ===========================================================  
-    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black,bottom: Tabbar,);
-
+    return AlertDialog(title: Text("Title"),content: Text("Hello in Flutter Corse"),actions: [TextButton(onPressed: (){}, child: Text("ok"))],);
+    });}
+    ,child: Text("Show alert Dialog"),color: Colors.black,textColor: Colors.white,);
+    
     //! =============================================================== Container ===========================================================
     // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
-    // Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: Tabview,  );
-    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: cw_row,  );
+    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: dialog  );    
+    // var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,);
 
+    // return MaterialApp(home: mainapp);
 
+    return MaterialApp(home: HomePage(),routes: {"home":(context) => HomePage(),"setting":(context) => SettingPage()});
 
-    
-    var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,);
-    // DefaultTabController tabController = DefaultTabController(child:mainapp ,length: 3,);
-    return MaterialApp(home: mainapp);
+  
+
   }
 
 
@@ -351,6 +333,19 @@ class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
   void Change_pages(int val) => setState(() {
     selectedindex = val;
   });
+
+
+  void appear_dialog(BuildContext context) => showDialog(context: context, builder: (context){
+  
+    return AlertDialog(
+      title: Text("Title"),
+      content: Text("Hello in Flutter Corse"),
+      actions: [TextButton(onPressed: (){}, child: Text("ok"))],
+    );
+  });
+
+
+  
 }
 
 
