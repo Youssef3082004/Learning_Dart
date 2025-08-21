@@ -12,10 +12,12 @@ class HomePage extends StatelessWidget{
   //! =============================================================== Appbar ===========================================================
     AppBar appbarscreen = AppBar(title: Text("Home"),elevation: 1.5,centerTitle: true,backgroundColor: Colors.blue,actions: [IconButton(onPressed:(){print("Hello");} ,icon: Icon(Icons.run_circle,size: 30,color: Colors.deepOrange))]);
 
-  //! =============================================================== Column ===========================================================
-
+  
+  //! =============================================================== Alert Dialog ===========================================================
     var dialog = MaterialButton(onPressed: () => appear_dialog(context)
     ,child: Text("Show alert Dialog"),color: Colors.black,textColor: Colors.white,);
+    
+  //! =============================================================== Column ===========================================================
 
     var Home_button = MaterialButton(onPressed: () => Navigator.of(context).pushNamed("setting"),child: Text("Go To Setting"),textColor: Colors.white,color: Colors.black,);
     var Home_buttonback = MaterialButton(onPressed: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder:(context) => SettingPage()),(route) => false),child: Text("Back"),textColor: Colors.white,color: Colors.black,);

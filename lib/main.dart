@@ -279,16 +279,39 @@ class Tabbbar extends StatefulWidget{
 }
 
 
-
-class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
+class _Tabbbar extends State<Tabbbar> {
 
   int selectedindex = 0;
+
+  GlobalKey<ScaffoldState> scaffoldkey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
 
     //! =============================================================== Appbar ===========================================================  
-    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black);
+    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black,
+    actions: [PopupMenuButton(itemBuilder: (context) => [
+      PopupMenuItem(child: Text("Button 1"),value: "one"),
+      PopupMenuItem(child: Text("Button 2"),value: "two"),
+      PopupMenuItem(child: Text("Button 3"),value: "three"),],
+
+      onSelected: (String val) => print("Selected: $val")
+      ,
+      onOpened: () => print("Popup opened")
+      ,
+      onCanceled: () => print("Popup canceled"),
+      icon: Icon(Icons.abc_outlined),
+
+
+
+    
+    
+    
+    
+    
+    
+     )],
+    );
 
 
     //! =============================================================== Bottem Navigitor Bar ===========================================================
@@ -302,32 +325,44 @@ class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
     // PageView app_pageview = PageView(children: [Text("page 1"),Text("page 2")],reverse: true,onPageChanged: (value) => print(value),);
      
     List<Text> widgets = [Text("page 1"),Text("page 2"),Text("page 3")];
-    PageView app_pageview = PageView.builder(itemCount: widgets.length,itemBuilder: (context, index) => widgets[index],);
+    PageView app_pageview = PageView.builder(itemCount: widgets.length,itemBuilder: (context, index) => widgets[index]);
 
     //! =============================================================== Custom Widget ===========================================================  
     Column cw_row = Column(children: [MyWidget(name: "Youssef Awadalla", email: "awadallayossef@gmail.com", Date: "30-8-2004")],);
 
     //! =============================================================== Alerts ===========================================================  
-    var dialog = MaterialButton(onPressed: () {showDialog(context: context, builder: (context){
+    var dialog = MaterialButton(onPressed: () => appear_dialog(context),child: Text("Show alert Dialog"),color: Colors.black,textColor: Colors.white,);
 
-    return AlertDialog(title: Text("Title"),content: Text("Hello in Flutter Corse"),actions: [TextButton(onPressed: (){}, child: Text("ok"))],);
-    });}
-    ,child: Text("Show alert Dialog"),color: Colors.black,textColor: Colors.white,);
+    //! =============================================================== showBottomSheet And SnackBar ===========================================================  
+    // var bottemshet = MaterialButton(onPressed: () => appear_bottemsheet(context),child: Text("Show alert Dialog"),color: Colors.black,textColor: Colors.white,);
+    var Snackbar = MaterialButton(onPressed: () => appear_snackbar(context),child: Text("Show Snackbar"),color: Colors.black,textColor: Colors.white,);
+ 
+    //! ===============================================================  List generate  ===========================================================  
+    List emplyess = [
+      {"name":"Youssef","age":20,"Salary":3500},
+      {"name":"Hamada","age":30,"Salary":4000},
+      {"name":"Awadalla","age":25,"Salary":9000},
+    ];
+
+
+    var emplyee_widget = ListView(children: [
+      ...List.generate(emplyess.length,(int index){                      //? three dots!! Why? Beacause it npt allowed to add list inside list so 3 dots will solve this problem 
+
+        return Card(child:ListTile(title: Text(emplyess[index]["name"]),subtitle: Text(emplyess[index]["age"].toString()),));
+      })
+      
     
+    ]);
+
     //! =============================================================== Container ===========================================================
     // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
-    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: dialog  );    
-    // var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,);
+    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: emplyee_widget  );    
+    var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,key: scaffoldkey,);
+    return MaterialApp(home: mainapp);
 
-    // return MaterialApp(home: mainapp);
-
-    return MaterialApp(home: HomePage(),routes: {"home":(context) => HomePage(),"setting":(context) => SettingPage()});
-
-  
+    // return MaterialApp(home: HomePage(),routes: {"home":(context) => HomePage(),"setting":(context) => SettingPage()});
 
   }
-
-
 
 
   void Change_pages(int val) => setState(() {
@@ -335,16 +370,31 @@ class _Tabbbar extends State<Tabbbar> with SingleTickerProviderStateMixin {
   });
 
 
-  void appear_dialog(BuildContext context) => showDialog(context: context, builder: (context){
+  void appear_dialog(BuildContext context) => showDialog(barrierDismissible: false,context: context, builder: (context){
   
     return AlertDialog(
       title: Text("Title"),
       content: Text("Hello in Flutter Corse"),
-      actions: [TextButton(onPressed: (){}, child: Text("ok"))],
+      actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("ok"))],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      
     );
   });
 
 
+  void appear_bottemsheet(BuildContext context) => scaffoldkey.currentState!.showBottomSheet((context){
+    BoxDecoration containerDecoration =BoxDecoration(color: Colors.red,borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))) ;
+
+    return Container(height:300,width:500,decoration:containerDecoration ,);
+
+
+  }); 
+
+  void appear_snackbar(BuildContext context) => ScaffoldMessenger.of(scaffoldkey.currentContext!).showSnackBar(
+    SnackBar(content: Text("Copied!"),duration: Duration(seconds: 3),action: SnackBarAction(label: "ok0", onPressed: (){}),)
+    
+    
+    );
   
 }
 
