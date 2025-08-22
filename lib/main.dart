@@ -285,32 +285,43 @@ class _Tabbbar extends State<Tabbbar> {
 
   GlobalKey<ScaffoldState> scaffoldkey = GlobalKey();
 
+  late ScrollController scroll ;
+
+
+
+  @override
+  void initState() {
+    scroll = ScrollController();
+    scroll.addListener(()=> print("${scroll.offset}"));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    //! it's good to minimize the load on the application 
+    scroll.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
 
     //! =============================================================== Appbar ===========================================================  
     AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black,
-    actions: [PopupMenuButton(itemBuilder: (context) => [
-      PopupMenuItem(child: Text("Button 1"),value: "one"),
-      PopupMenuItem(child: Text("Button 2"),value: "two"),
-      PopupMenuItem(child: Text("Button 3"),value: "three"),],
-
-      onSelected: (String val) => print("Selected: $val")
-      ,
-      onOpened: () => print("Popup opened")
-      ,
-      onCanceled: () => print("Popup canceled"),
-      icon: Icon(Icons.abc_outlined),
-
-
-
-    
-    
-    
-    
-    
-    
-     )],
+    // actions: [PopupMenuButton(itemBuilder: (context) => [
+    //   PopupMenuItem(child: Text("Button 1"),value: "one"),
+    //   PopupMenuItem(child: Text("Button 2"),value: "two"),
+    //   PopupMenuItem(child: Text("Button 3"),value: "three"),],
+    //   onSelected: (String val) => print("Selected: $val"),
+    //   onOpened: () => print("Popup opened"),
+    //   onCanceled: () => print("Popup canceled"),
+    //   icon: Icon(Icons.menu),)
+    actions: [
+      
+    Builder(builder: (context) => IconButton(icon: Icon(Icons.search),onPressed: () => showSearch(context: context,delegate: CustomSearch())))
+      
+      
+      ],
     );
 
 
@@ -337,7 +348,7 @@ class _Tabbbar extends State<Tabbbar> {
     // var bottemshet = MaterialButton(onPressed: () => appear_bottemsheet(context),child: Text("Show alert Dialog"),color: Colors.black,textColor: Colors.white,);
     var Snackbar = MaterialButton(onPressed: () => appear_snackbar(context),child: Text("Show Snackbar"),color: Colors.black,textColor: Colors.white,);
  
-    //! ===============================================================  List generate  ===========================================================  
+    //! ===============================================================  List generate & Scroll  ===========================================================  
     List emplyess = [
       {"name":"Youssef","age":20,"Salary":3500},
       {"name":"Hamada","age":30,"Salary":4000},
@@ -345,11 +356,17 @@ class _Tabbbar extends State<Tabbbar> {
     ];
 
 
-    var emplyee_widget = ListView(children: [
-      ...List.generate(emplyess.length,(int index){                      //? three dots!! Why? Beacause it npt allowed to add list inside list so 3 dots will solve this problem 
+    var emplyee_widget = ListView(
+      controller: scroll,
+      
+      children: [
 
-        return Card(child:ListTile(title: Text(emplyess[index]["name"]),subtitle: Text(emplyess[index]["age"].toString()),));
-      })
+      MaterialButton(onPressed: () => scroll.animateTo(7390,duration: Duration(seconds: 10),curve: Curves.ease),child: Text("Jump To Bottom"),),
+      ...List.generate(100,(int index){                      //? three dots!! Why? Beacause it npt allowed to add list inside list so 3 dots will solve this problem 
+
+        return Card(child:ListTile(title: Text(index.toString()),subtitle: Text(index.toString()),));
+      }),
+      MaterialButton(onPressed: () => scroll.jumpTo(0),child: Text("Jump To top"),),
       
     
     ]);
@@ -358,7 +375,7 @@ class _Tabbbar extends State<Tabbbar> {
     // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
     Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: emplyee_widget  );    
     var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,key: scaffoldkey,);
-    return MaterialApp(home: mainapp);
+    return MaterialApp(home: mainapp,debugShowCheckedModeBanner: false);
 
     // return MaterialApp(home: HomePage(),routes: {"home":(context) => HomePage(),"setting":(context) => SettingPage()});
 
@@ -396,6 +413,74 @@ class _Tabbbar extends State<Tabbbar> {
     
     );
   
+}
+
+
+
+
+class CustomSearch extends SearchDelegate{
+  final List<String> searchList = [
+    "Apple",
+    "Banana",
+    "Cherry",
+    "Date",
+    "Fig",
+    "Grapes",
+    "Kiwi",
+    "Lemon",
+    "Mango",
+    "Orange",
+    "Papaya",
+    "Raspberry",
+    "Strawberry",
+    "Tomato",
+    "Watermelon",
+  ];
+
+
+  List? Filterlist;
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(onPressed: () => query = "", icon: Icon(Icons.clear))
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+      
+    return IconButton(onPressed: () =>close(context, null) , icon: Icon(Icons.arrow_back));
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Text("REsult");
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+
+    if (query ==""){
+      return ListView.builder(itemCount:searchList.length ,itemBuilder:  (context,i) {
+      var suggestion = ListTile(title: Text(" ${searchList[i]}"),);
+      return Card(child:suggestion);
+      });
+    }
+
+    else{
+      Filterlist = searchList.where((Element)=> Element.toLowerCase().contains(query.toLowerCase())).toList();
+
+      return ListView.builder(itemCount:Filterlist!.length ,itemBuilder:  (context,i) {
+      var suggestion = InkWell(onTap: () => showResults(context),child: ListTile(title: Text(" ${Filterlist![i]}"),));
+      return Card(child:suggestion);
+      });
+
+
+    }
+   
+  }
+
 }
 
 
