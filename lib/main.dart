@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'custom.dart'; 
-import 'package:first_app/Navigator_work.dart'; 
+import 'package:http/http.dart' as http;
 
 
 void main() {
@@ -286,6 +287,10 @@ class _Tabbbar extends State<Tabbbar> {
   GlobalKey<ScaffoldState> scaffoldkey = GlobalKey();
 
   late ScrollController scroll ;
+  List Data = [];
+  bool loading = false;
+  TextEditingController  controller = TextEditingController();
+
 
 
 
@@ -371,11 +376,33 @@ class _Tabbbar extends State<Tabbbar> {
     
     ]);
 
+    //! =============================================================== Http Request ===========================================================
+    var Request_button = MaterialButton(child: Text("data"),onPressed: () => Request_data());
+
+    var list_controls = ListView(children: [
+      Request_button,
+     if (loading) Center(child: CircularProgressIndicator()) 
+      
+     else ...List.generate(Data.length, (index) => Card(child: ListTile(title:Text(Data[index]["name"],style: TextStyle(fontFamily: "Pac")) ,),))
+    ]);
+
+    //! =============================================================== Future Builder ===========================================================
+
+    FutureBuilder<List> futurebuild = FutureBuilder<List>(future: get_data(), builder: (context,snapshot){
+
+      if (snapshot.connectionState == ConnectionState.waiting) {return Center(child: CircularProgressIndicator()) ;}
+      else {return ListView.builder(itemCount: snapshot.data!.length,itemBuilder: (context, index) => Card(child: ListTile(title:Text(snapshot.data![index]["name"]) ,)));}
+
+    });
+
+
+   
+
     //! =============================================================== Container ===========================================================
     // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
-    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: emplyee_widget  );    
+    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: futurebuild  );    
     var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,key: scaffoldkey,);
-    return MaterialApp(home: mainapp,debugShowCheckedModeBanner: false);
+    return MaterialApp(home: mainapp,debugShowCheckedModeBanner: false,theme: ThemeData(fontFamily:"Pac"),);
 
     // return MaterialApp(home: HomePage(),routes: {"home":(context) => HomePage(),"setting":(context) => SettingPage()});
 
@@ -412,6 +439,21 @@ class _Tabbbar extends State<Tabbbar> {
     
     
     );
+
+  void Request_data() async{
+    var response = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/comments"));
+      loading = true;
+      setState(() {});
+      Data.addAll(jsonDecode(response.body));
+      loading = false;
+      setState(() {});
+  }
+
+  Future<List> get_data() async{
+    var response = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/comments"));
+    List Data = jsonDecode(response.body);
+    return Data ;
+  }
   
 }
 
@@ -450,7 +492,7 @@ class CustomSearch extends SearchDelegate{
   @override
   Widget? buildLeading(BuildContext context) {
       
-    return IconButton(onPressed: () =>close(context, null) , icon: Icon(Icons.arrow_back));
+    return IconButton(onPressed: () => close(context, null) , icon: Icon(Icons.arrow_back));
   }
 
   @override
