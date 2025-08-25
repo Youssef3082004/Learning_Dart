@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'custom.dart'; 
 import 'package:http/http.dart' as http;
 
@@ -292,12 +294,18 @@ class _Tabbbar extends State<Tabbbar> {
   TextEditingController  controller = TextEditingController();
 
 
+  StreamSubscription<Position>? positionStream;
+
+
+
 
 
   @override
   void initState() {
     scroll = ScrollController();
     scroll.addListener(()=> print("${scroll.offset}"));
+    
+    // getcurrentloactionapp();
     super.initState();
   }
 
@@ -305,14 +313,17 @@ class _Tabbbar extends State<Tabbbar> {
   void dispose() {
     //! it's good to minimize the load on the application 
     scroll.dispose();
+    
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // final textTheme = Theme.of(context).textTheme;
+
 
     //! =============================================================== Appbar ===========================================================  
-    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,backgroundColor: Colors.blue,shadowColor: Colors.black,
+    AppBar appbarscreen = AppBar(title: Text("First app"),elevation: 0.0,centerTitle: true,shadowColor: Colors.black,
     // actions: [PopupMenuButton(itemBuilder: (context) => [
     //   PopupMenuItem(child: Text("Button 1"),value: "one"),
     //   PopupMenuItem(child: Text("Button 2"),value: "two"),
@@ -361,20 +372,25 @@ class _Tabbbar extends State<Tabbbar> {
     ];
 
 
-    var emplyee_widget = ListView(
-      controller: scroll,
-      
-      children: [
-
-      MaterialButton(onPressed: () => scroll.animateTo(7390,duration: Duration(seconds: 10),curve: Curves.ease),child: Text("Jump To Bottom"),),
-      ...List.generate(100,(int index){                      //? three dots!! Why? Beacause it npt allowed to add list inside list so 3 dots will solve this problem 
-
-        return Card(child:ListTile(title: Text(index.toString()),subtitle: Text(index.toString()),));
-      }),
-      MaterialButton(onPressed: () => scroll.jumpTo(0),child: Text("Jump To top"),),
-      
-    
-    ]);
+    var emplyee_widget = Builder(
+      builder: (context) {
+        return ListView(
+          controller: scroll,
+          
+          children: [
+        
+          MaterialButton(onPressed: () => scroll.animateTo(7390,duration: Duration(seconds: 10),curve: Curves.ease),child: Text("Jump To Bottom"),),
+          ...List.generate(100,(int index){  //? three dots!! Why? Beacause it npt allowed to add list inside list so 3 dots will solve this problem 
+        
+            return Card(child:ListTile(title: Text(index.toString(),style: Theme.of(context).textTheme.bodyLarge,
+        ),subtitle: Text(index.toString()),));
+          }),
+          MaterialButton(onPressed: () => scroll.jumpTo(0),child: Text("Jump To top"),),
+          
+        
+        ]);
+      }
+    );
 
     //! =============================================================== Http Request ===========================================================
     var Request_button = MaterialButton(child: Text("data"),onPressed: () => Request_data());
@@ -388,21 +404,32 @@ class _Tabbbar extends State<Tabbbar> {
 
     //! =============================================================== Future Builder ===========================================================
 
-    FutureBuilder<List> futurebuild = FutureBuilder<List>(future: get_data(), builder: (context,snapshot){
+    // FutureBuilder<List> futurebuild = FutureBuilder<List>(future: get_data(), builder: (context,snapshot){
 
-      if (snapshot.connectionState == ConnectionState.waiting) {return Center(child: CircularProgressIndicator()) ;}
-      else {return ListView.builder(itemCount: snapshot.data!.length,itemBuilder: (context, index) => Card(child: ListTile(title:Text(snapshot.data![index]["name"]) ,)));}
+    //   if (snapshot.connectionState == ConnectionState.waiting) {return Center(child: CircularProgressIndicator()) ;}
+    //   else {return ListView.builder(itemCount: snapshot.data!.length,itemBuilder: (context, index) => Card(child: ListTile(title:Text(snapshot.data![index]["name"]))));}
 
-    });
+    // });
 
 
-   
+    
 
     //! =============================================================== Container ===========================================================
     // BoxDecoration containerDecoration =BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(90),border: Border.all(color: Colors.black,width: 1),boxShadow: [BoxShadow(color: Colors.black,offset: Offset(1, 5),blurRadius: 20,blurStyle: BlurStyle.solid)]) ;
-    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: futurebuild  );    
+    Container screencontainer = Container(padding: EdgeInsets.all(10),alignment:Alignment.center,child: emplyee_widget);    
     var mainapp = Scaffold(appBar: appbarscreen,body: Center(child:screencontainer),bottomNavigationBar: app_navbar,key: scaffoldkey,);
-    return MaterialApp(home: mainapp,debugShowCheckedModeBanner: false,theme: ThemeData(fontFamily:"Pac"),);
+    return MaterialApp(home: mainapp,debugShowCheckedModeBanner: false,
+    theme: ThemeData(fontFamily:"Pac",textTheme: TextTheme(
+      bodyLarge: TextStyle(color: Colors.red,fontSize: 40),
+      bodyMedium: TextStyle(color: Colors.blue,fontSize: 20),
+      bodySmall: TextStyle(color: Colors.green,fontSize: 10)
+
+    ),
+    appBarTheme: AppBarTheme(backgroundColor: Colors.red)),
+    
+    
+    
+    );
 
     // return MaterialApp(home: HomePage(),routes: {"home":(context) => HomePage(),"setting":(context) => SettingPage()});
 
@@ -449,10 +476,57 @@ class _Tabbbar extends State<Tabbbar> {
       setState(() {});
   }
 
-  Future<List> get_data() async{
+  Future<List>? get_data() async{
     var response = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/comments"));
     List Data = jsonDecode(response.body);
     return Data ;
+  }
+
+
+  getcurrentloactionapp()async{
+    bool serviceEnabled ;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (serviceEnabled == false){
+      print("A7aaaaaaa");
+    }
+
+    else{print("Good Job");}
+
+
+
+    permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
+    }
+  }
+
+  if (permission == LocationPermission.whileInUse){
+    print("Accepted in While use");
+
+    Position position = await Geolocator.getCurrentPosition();
+    print("Latitude = ${position.latitude} ");
+    print("Longitude = ${position.longitude} ");
+    
+    
+
+
+    positionStream = Geolocator.getPositionStream().listen(
+    (Position? position) {
+        print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+    });
+
+
+
+    double distanceInMeters = Geolocator.distanceBetween(52.2165157, 6.9437819, 52.3546274, 4.8285838);
+    print(distanceInMeters);
+
+  }
+
   }
   
 }
