@@ -347,7 +347,7 @@ class _Tabbbar extends State<Tabbbar> {
       BottomNavigationBarItem(icon: Icon(Icons.settings),label: "Settings"),
     ];
   
-    var app_navbar = BottomNavigationBar(currentIndex: selectedindex,items: items,backgroundColor: Colors.blue,selectedItemColor: Colors.black,unselectedItemColor: Colors.white,onTap:(int val) =>Change_pages(val));
+    BottomNavigationBar app_navbar =  BottomNavigationBar(currentIndex: selectedindex,items: items,backgroundColor: Colors.blue,selectedItemColor: Colors.black,unselectedItemColor: Colors.white,onTap:(int val) =>Change_pages(val));
     //! =============================================================== PageView ===========================================================  
     // PageView app_pageview = PageView(children: [Text("page 1"),Text("page 2")],reverse: true,onPageChanged: (value) => print(value),);
      
