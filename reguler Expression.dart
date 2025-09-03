@@ -1,5 +1,5 @@
 void main() {
   String pattern = r"/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/.";
-  RegExp re = new RegExp(pattern);
+  RegExp re = RegExp(pattern);
   print(re.hasMatch("awadallayossef@gmail.com"));
 }
